@@ -1,0 +1,39 @@
+program ::= %w* statement+ ;
+
+statement ::= assign | block | vocab ;
+
+w ::= " " | "\t" | nl | comment ;
+	nl ::= "\r\n" | "\n" ;
+ws ::= " " | "\t" ; # single line whitespace
+
+comment ::= comment_single | comment_multi ;
+	comment_single ::= "//" !( nl )* nl? ;
+	comment_multi  ::= "/*" !"*/"+ "*/" ;
+
+name ::= ( "_" | letter) ( letter | digit | "_" )* ;
+	letter   ::= "a"->"z"+ | "A"->"Z"+ ;
+	digit    ::= "0"->"9"+ ;
+	digit_nz ::= "1"->"9"+ ;
+
+keyword ::= "minimal" ;
+integer ::= "0" | (digit_nz digit*) ;
+tense ::= "past" | "present" | "future";
+
+vocab ::= %("vocab" w+) ...name %w* ;
+
+expr ::= operand %ws* (...operator %w* operand %ws*)* ;
+	operator ::= "&" | "|" | "-" ;
+	operand  ::= ( ...name | brackets ) selector? %ws* ;
+	brackets ::= %("(" w*) expr %(w* ")" w*) ;
+	selector ::= %(w* "[" w*) ("id" | "pick" | "!pick") %w* ...integer %(w* "]" w*) ;
+	capture  ::= "$" ...integer ;
+
+
+assign ::= %("let" w+) ...name %(w* "=" w*) expr %w* ;
+
+block ::= %("unit" ws+) ...name %(w* "{" w*) stmt* %("}" w*) ;
+	stmt ::= ...name %(ws* ":" ws*) stmt_value %w* ;
+		stmt_value ::= string | list | ...keyword | expr | ...integer ;
+	string ::= %( ">" ws* ) ( !("$" | nl)+ | str_embed )+ ;
+		str_embed ::= %("${" w*) ...name %(w* ":" w*) expr %w* ...tense? %(w* "}");
+	list ::= expr %ws* ( %"," %ws* expr %ws* )+ ;
