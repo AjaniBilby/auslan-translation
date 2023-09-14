@@ -3,9 +3,11 @@
 import { existsSync } from "https://deno.land/std@0.201.0/fs/mod.ts";
 import * as colors from "https://deno.land/std@0.201.0/fmt/colors.ts";
 
-import { dataset } from "../dataset.ts";
-
 import { Panic } from "../helper.ts";
+import { Scope } from "./generator.ts";
+
+import * as Parser from "../bnf/syntax.js";
+await Parser.ready;
 
 if (Deno.args.includes("--version")) {
 	console.log("version: 0.0.0");
@@ -19,4 +21,5 @@ const targetPath = `./concept/${target}`;
 if (!existsSync(targetPath)) Panic(`${colors.red("Error")}: Unable to find file`);
 const program = Deno.readTextFileSync(targetPath);
 
-console.log(dataset, program);
+const scope = new Scope();
+scope.compute(program);

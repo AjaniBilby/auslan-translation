@@ -1,17 +1,20 @@
-import { ParseError, SyntaxNode, Reference, ReferenceRange, AssertUnreachable } from "../bnf/shared.d.ts";
-import * as Parser from "../bnf/syntax.js";
+// @deno-types="../bnf/shared.d.ts"
+import { SyntaxNode, Reference, ReferenceRange, AssertUnreachable } from "../bnf/shared.js";
+// @deno-types="../bnf/syntax.d.ts"
+import { Term_Assign, Term_Block, Term_Expr, Term_Operand, Term_Program, Term_Statement, Term_Stmt_value, Term_String, Term_Vocab } from "../bnf/syntax.js";
+
+import { ParseError } from "../bnf/shared.js";
+import { Parse_Program } from "../bnf/syntax.js";
 
 import { Entropify } from "./entropy.ts";
 import { LazySamples } from './lazy.ts';
 
+import { Sign, dataset } from "../dataset.ts";
+import { Panic } from "../helper.ts";
+
 export {
 	ParseError, Reference, ReferenceRange
 }
-
-type FullSign = Sign & {
-	tokens: TokenMapping[],
-	keywords: ( KeywordRefType & { keyword: Keyword } )[]
-};
 
 export class Translation {
 	sequence: number[];
@@ -45,10 +48,10 @@ enum SignTense {
 }
 
 export class SignRef {
-	sign: FullSign;
+	sign: Sign;
 	tense: SignTense;
 
-	constructor(sign: FullSign, tense: SignTense) {
+	constructor(sign: Sign, tense: SignTense) {
 		this.sign = sign;
 		this.tense = tense;
 
@@ -70,7 +73,7 @@ export class SignRef {
 		const synonyms = this.sign.keywords;
 		if (synonyms.length > 0 && Math.random() > 0.75) {
 			const rand = synonyms[Math.floor( Math.random()*synonyms.length )];
-			if (rand.keyword.text) return rand.keyword.text;
+			if (rand) return rand;
 		}
 
 		return this.sign.title;
@@ -95,7 +98,7 @@ export class Scope {
 
 	categories: { [key: number]: number };
 	lists:      { [key: number]: number[] };
-	signs:      { [key: number]: FullSign };
+	signs:      { [key: number]: Sign };
 
 	constructor() {
 		this.scope = {};
@@ -128,14 +131,14 @@ export class Scope {
 	}
 
 	clearScoped() {
-		for (let name in this.scope) {
+		for (const name in this.scope) {
 			if (name[0] === "_") this.unset(name);
 		}
 	}
 
-	setVocab(syntax: any) {
+	setVocab(syntax: Term_Program) {
 		const stmts = syntax.value[0].value as SyntaxNode[];
-		for (let statement of stmts) {
+		for (const statement of stmts) {
 			const action = (statement as SyntaxNode).value[0] as SyntaxNode;
 			switch (action.type) {
 				case "vocab": this.vocab = (action.value[0] as SyntaxNode ).value as string; break;
@@ -143,8 +146,8 @@ export class Scope {
 		}
 	}
 
-	async preload(syntax: Parser.Term_Program) {
-		let targets: PreloadMetaTargets = {
+	preload(syntax: Term_Program) {
+		const targets: PreloadMetaTargets = {
 			signs: new Set(),
 			lists: new Set(),
 			cats : new Set(),
@@ -152,12 +155,7 @@ export class Scope {
 		Scope.findLoadTargets(syntax, targets);
 		this.setVocab(syntax);
 
-		if (this.vocab !== "auto") {
-			const vocab = await prisma.tokenSet.findFirst({where: {name: this.vocab}});
-			if (!vocab) throw new ParseError(`Unknown token set ${vocab}`, syntax.ref);
-
-			this.vocabID = vocab.id;
-		}
+		if (this.vocab !== "auto" && dataset.vocab.name != this.vocab) Panic(`Loaded vocab ${dataset.vocab.name}, but requires vocab ${this.vocab}`)
 
 		this.scope["prepositions"] = [];
 		this.scope["quantifiers"] = [];
@@ -165,20 +163,7 @@ export class Scope {
 		this.scope["adVerbs"] = [];
 		this.scope["nouns"] = [];
 		this.scope["verbs"] = [];
-		(await prisma.sign.findMany({
-			where: {
-				tokens: { some: { setID: this.vocabID } }
-			},
-			include: {
-				tokens: {
-					where: { setID: this.vocabID }
-				},
-				keywords: {
-					where: { type: "SYNONYM" },
-					include: { keyword: true }
-				}
-			}
-		})).forEach(sign => {
+		for (const sign of dataset.sign) {
 			this.signs[sign.id] = sign;
 			if (sign.isPreposition) this.scope["prepositions"].push(sign.id);
 			if (sign.isQuantifier)  this.scope["quantifiers"].push(sign.id);
@@ -186,36 +171,24 @@ export class Scope {
 			if (sign.isAdverb)      this.scope["adVerbs"].push(sign.id);
 			if (sign.isVerb)        this.scope["verbs"].push(sign.id);
 			if (sign.isNoun)        this.scope["nouns"].push(sign.id);
-		});
+		}
 
-		(await prisma.category.findMany({
-			where: {id: { in: [...targets.cats] }}
-		})).forEach(result => {
-			this.categories[result.id] = result.listID;
-			targets.lists.add(result.listID);
-		});
+		for (const catID of targets.cats) {
+			const key = String(catID);
+			const res = dataset.category[key];
+			if (!res) Panic(`Unknown category id ${key}`);
 
+			this.categories[catID] = res;
+		}
 
-		this.scope.all = Object.keys(this.signs).map(x => Number(x));
-		(await prisma.signList.findMany({
-			where: {
-				id: { in: [...targets.lists] }
-			},
-			include: {
-				signs: {
-					select: { id: true },
-				},
-			}
-		})).forEach(result => {
-			this.lists[result.id] = result.signs
-				.filter(x => this.scope.all.includes(x.id))
-				.map(x => x.id);
-		});
+		for (const key in dataset.list) {
+			this.lists[Number(key)] = dataset.list[key];
+		}
 	}
 
 	static findLoadTargets(syntax: SyntaxNode, targets: PreloadMetaTargets) {
 		if (syntax.type == "operand") {
-			const base = syntax as Parser.Term_Operand;
+			const base = syntax as Term_Operand;
 			const selector = base.value[1].value[0];
 
 			if (base.value[0].type === "literal" && selector) {
@@ -229,7 +202,7 @@ export class Scope {
 		}
 
 		if (Array.isArray(syntax.value)) {
-			for (let inner of syntax.value) {
+			for (const inner of syntax.value) {
 				Scope.findLoadTargets(inner, targets);
 			}
 		}
@@ -238,7 +211,7 @@ export class Scope {
 	}
 
 
-	category(syntax: Parser.Term_Operand) {
+	category(syntax: Term_Operand) {
 		const selector = syntax.value[1].value[0];
 		if (!selector) throw new ParseError(`Category selector`, syntax.ref);
 
@@ -253,7 +226,7 @@ export class Scope {
 		return this.lists[listID] || listID;
 	}
 
-	list(syntax: Parser.Term_Operand) {
+	list(syntax: Term_Operand) {
 		const selector = syntax.value[1].value[0];
 		if (!selector) throw new ParseError(`List selector`, syntax.ref);
 
@@ -266,7 +239,7 @@ export class Scope {
 		return this.lists[goal];
 	}
 
-	sign(syntax: Parser.Term_Operand) {
+	sign(syntax: Term_Operand) {
 		const selector = syntax.value[1].value[0];
 		if (!selector) throw new ParseError(`Sign selector`, syntax.ref);
 
@@ -280,7 +253,7 @@ export class Scope {
 
 
 
-	operand(syntax: Parser.Term_Operand): number[] {
+	operand(syntax: Term_Operand): number[] {
 		const selector = syntax.value[1].value[0];
 		const target   = syntax.value[0];
 		let val;
@@ -317,10 +290,10 @@ export class Scope {
 		return val;
 	}
 
-	expr(syntax: Parser.Term_Expr) {
+	expr(syntax: Term_Expr) {
 		let state = this.operand(syntax.value[0]);
 
-		for (let chain of syntax.value[1].value) {
+		for (const chain of syntax.value[1].value) {
 			const other = this.operand(chain.value[1]);
 			switch (chain.value[0].value) {
 				case "|":
@@ -342,9 +315,9 @@ export class Scope {
 		return state;
 	}
 
-	parseString(syntax: Parser.Term_String) {
-		let frags : (string | SignRef)[][] = [];
-		let order : string[] = [];
+	parseString(syntax: Term_String) {
+		const frags : (string | SignRef)[][] = [];
+		const order : string[] = [];
 
 		for (const frag of syntax.value[0].value) {
 			if (frag.type === "literal") {
@@ -380,10 +353,10 @@ export class Scope {
 		};
 	}
 
-	parseList(syntax: Parser.Term_Stmt_value, order: string[]) {
+	parseList(syntax: Term_Stmt_value, order: string[]) {
 		const inner = syntax.value[0];
 
-		let exprs: Parser.Term_Expr[];
+		let exprs: Term_Expr[];
 		if (inner.type === "list") {
 			exprs = (inner.value[1].value)
 				.map((x) => x.value[0])
@@ -397,9 +370,9 @@ export class Scope {
 			throw new ParseError(`Expected list`, syntax.ref);
 		}
 
-		let list : number[][] = [];
-		let names: string[]   = [];
-		for (let expr of exprs) {
+		const list : number[][] = [];
+		const names: string[]   = [];
+		for (const expr of exprs) {
 			const base = expr.value[0].value[0];
 			if (base.type !== "literal") throw new ParseError(`Must be a variable`, expr.ref);
 			if (expr.value[1].value.length > 0)            throw new ParseError(`Must be a single operand`, expr.ref);
@@ -416,7 +389,7 @@ export class Scope {
 
 			// Convert signIDs to tokenIDs
 			for (let i=0; i<res.length; i++) {
-				res[i] = this.signs[res[i]].tokens[0].tokenID;
+				res[i] = this.signs[res[i]].tokenID;
 			}
 
 			list.push(res);
@@ -436,7 +409,7 @@ export class Scope {
 
 
 
-	runAssign(syntax: Parser.Term_Assign) {
+	runAssign(syntax: Term_Assign) {
 		this.setOverride(
 			syntax.value[0].value,
 			this.expr(syntax.value[1])
@@ -445,7 +418,7 @@ export class Scope {
 
 
 
-	runSequence(block: Parser.Term_Block) {
+	runSequence(block: Term_Block) {
 		let text: LazySamples<string | SignRef> | null = null;
 		let tokens: LazySamples<number> | null = null;
 		let order: string[] = [];
@@ -454,7 +427,7 @@ export class Scope {
 
 		console.time("Sequence Generation");
 		const stmts = block.value[1].value;
-		for (let line of stmts) {
+		for (const line of stmts) {
 			const type = line.value[0].value;
 			const val = line.value[1].value[0];
 
@@ -490,7 +463,7 @@ export class Scope {
 		this.clearScoped();
 	}
 
-	runBlock(syntax: Parser.Term_Block) {
+	runBlock(syntax: Term_Block) {
 		if (typeof(syntax.value) === "string") throw new ParseError("Internal error", syntax.ref);
 
 
@@ -502,22 +475,23 @@ export class Scope {
 	}
 
 
-	runStatements(syntax: Parser.Term_Statement[]) {
-		for (let statement of syntax) {
+	runStatements(syntax: Term_Statement[]) {
+		for (const statement of syntax) {
 			const action = statement.value[0];
 			switch (action.type) {
 				case "assign": this.runAssign(action); break;
 				case "block": this.runBlock(action); break;
 				case "vocab": break;
-				default: throw new ParseError(`Unknown statement type "${action.type}"`, statement.ref);
+				default: throw new ParseError(`unreachable`, statement.ref);
 			}
 		}
 	}
 
 	async compute(outline: string) {
-		const result = Parser.Parse_Program(outline);
+		const result = Parse_Program(outline);
 
 		if (result instanceof ParseError) throw result;
+
 		if (result.isPartial) throw new ParseError(
 			"Partial: Unexpected syntax at", new ReferenceRange(
 				result.root.ref?.end || Reference.blank(),
@@ -544,10 +518,10 @@ export class Scope {
 
 
 function Interleave(sections: Translation[][]): Translation[] {
-	let out: Translation[] = [];
+	const out: Translation[] = [];
 	const max = sections.reduce((s, x) => Math.max(s, x.length), 0);
 	const inc = sections.map(x => max/x.length);
-	let   key = [...inc];
+	const key = [...inc];
 
 	let remaining = sections.length;
 	while (remaining > 0) {
@@ -568,34 +542,6 @@ function Interleave(sections: Translation[][]): Translation[] {
 	}
 
 	return out.reverse();
-}
-
-
-function LinearisePermutations<T>(frags: T[][], order: number[]): T[][] {
-	const key: number[] = Array(frags.length).fill(0);
-	const outputs: T[][] = [];
-
-	let running = true;
-	while (running) {
-		const sample = frags.map((x, i) => x[ key[order[i]] ]);
-		outputs.push(sample);
-
-		let carry = true;
-		for (let i=0; carry && i<key.length; i++) {
-			const idx = order[i];
-			key[i]++;
-
-			carry = key[i] >= frags[idx].length;
-			if (carry) {
-				key[i] = 0;
-				if (i+1 === order.length) {
-					running = false;
-				}
-			}
-		}
-	}
-
-	return outputs;
 }
 
 
