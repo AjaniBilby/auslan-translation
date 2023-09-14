@@ -498,7 +498,7 @@ export class Scope {
 				result.root.ref?.end.clone() || Reference.blank()
 		));
 
-		await this.preload(result.root);
+		this.preload(result.root);
 
 		console.time("Generate Tokens");
 		this.runStatements(result.root.value[0].value);

@@ -39,6 +39,10 @@ function IsEntropyWorthy(arr: Option[], entropy: number) {
 	return entropy > last.entropy;
 }
 
+function WriteText(text: string) {
+	Deno.stdout.writeSync(new TextEncoder().encode(text));
+}
+
 
 const HIGH_WATER_MARK = 2**18;
 function* ShuffleSet(x: number): Generator<number, void, unknown> {
@@ -128,7 +132,7 @@ export function Entropify(text: LazySamples<SignRef | string>, tokens: LazySampl
 		}
 	}
 
-	process.stdout.write("estimating duration...");
+	WriteText("estimating duration...");
 	while (partialIndices.size > 0 && out.length < take) {
 		// Take best options
 		let options: Option[] = [];
@@ -162,16 +166,16 @@ export function Entropify(text: LazySamples<SignRef | string>, tokens: LazySampl
 			const duration = Date.now() - start;
 			const total = duration / ( out.length/take );
 			const remaining = total-duration;
-			process.stdout.write(`\r  ${take-out.length} remaining ${msToDuration(remaining)} (${indices.size})    `);
+			WriteText(`\r  ${take-out.length} remaining ${msToDuration(remaining)} (${indices.size})    `);
 		}
 	}
-	process.stdout.write(`\r                                                           \r`);
+	WriteText(`\r                                                           \r`);
 	console.timeEnd("  medium fill");
 
 
 
 	// Slow fill using full entropy calculations
-	process.stdout.write("estimating duration...");
+	WriteText("estimating duration...");
 	console.time("  slow fill");
 	while (indices.size > 0 && out.length < take) {
 		// Take best options
@@ -199,10 +203,10 @@ export function Entropify(text: LazySamples<SignRef | string>, tokens: LazySampl
 			const duration = Date.now() - start;
 			const total = duration / ( out.length/take );
 			const remaining = total-duration;
-			process.stdout.write(`\r  ${take-out.length} remaining ${msToDuration(remaining)} (${indices.size})    `);
+			WriteText(`\r  ${take-out.length} remaining ${msToDuration(remaining)} (${indices.size})    `);
 		}
 	}
-	process.stdout.write(`\r                                                           \r`);
+	WriteText(`\r                                                           \r`);
 	console.timeEnd("  slow fill");
 	console.log(`  Entropy: ${entropy}`);
 
