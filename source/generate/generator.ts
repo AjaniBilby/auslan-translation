@@ -163,6 +163,7 @@ export class Scope {
 		this.scope["adVerbs"] = [];
 		this.scope["nouns"] = [];
 		this.scope["verbs"] = [];
+		this.scope["all"] = [];
 		for (const sign of dataset.sign) {
 			this.signs[sign.id] = sign;
 			if (sign.isPreposition) this.scope["prepositions"].push(sign.id);
@@ -171,6 +172,7 @@ export class Scope {
 			if (sign.isAdverb)      this.scope["adVerbs"].push(sign.id);
 			if (sign.isVerb)        this.scope["verbs"].push(sign.id);
 			if (sign.isNoun)        this.scope["nouns"].push(sign.id);
+			this.scope["all"].push(sign.id);
 		}
 
 		for (const catID of targets.cats) {
