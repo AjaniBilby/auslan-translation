@@ -1,0 +1,12 @@
+vocab auslan_v1
+
+let we = sign[id 713]
+let want = sign[id 708]
+let protect = sign[id 1212]
+let your = sign[id 739]
+let smile = sign[id 235]
+
+unit TextToSign {
+	english: > bau bau
+	sign: we, want, your, smile, protect
+}

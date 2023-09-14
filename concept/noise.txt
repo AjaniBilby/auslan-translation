@@ -1,0 +1,55 @@
+vocab auslan_v1
+
+unit TextToSign {
+	english: > ${_a1: all} ${_a2: all}
+	sign: _a1, _a2
+	take: 17000
+}
+
+unit TextToSign {
+	english: > ${_a1: all} ${_a2: all} ${_a3: all}
+	sign: _a1, _a2, _a3
+	take: 17000
+}
+
+unit TextToSign {
+	english: > ${_a1: all} ${_a2: all} ${_a3: all} ${_a4: all}
+	sign: _a1, _a2, _a3, _a4
+	take: 17600
+}
+
+unit TextToSign {
+	english: > ${_a1: all} ${_a2: all} ${_a3: all} ${_a4: all} ${_a5: all}
+	sign: _a1, _a2, _a3, _a4, _a5
+	take: 17700
+}
+
+unit TextToSign {
+	english: > ${_a1: all} ${_a2: all} ${_a3: all} ${_a4: all} ${_a5: all} ${_a6: all}
+	sign: _a1, _a2, _a3, _a4, _a5, _a6
+	take: 17700
+}
+
+unit TextToSign {
+	english: > ${_a1: all} ${_a2: all} ${_a3: all} ${_a4: all} ${_a5: all} ${_a6: all} ${_a7: all}
+	sign: _a1, _a2, _a3, _a4, _a5, _a6, _a7
+	take: 17700
+}
+
+unit TextToSign {
+	english: > ${_a1: all} ${_a2: all} ${_a3: all} ${_a4: all} ${_a5: all} ${_a6: all} ${_a7: all} ${_a8: all}
+	sign: _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8
+	take: 17400
+}
+
+unit TextToSign {
+	english: > ${_a1: all} ${_a2: all} ${_a3: all} ${_a4: all} ${_a5: all} ${_a6: all} ${_a7: all} ${_a8: all} ${_a9: all}
+	sign: _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9
+	take: 17000
+}
+
+unit TextToSign {
+	english: > ${_a1: all} ${_a2: all} ${_a3: all} ${_a4: all} ${_a5: all} ${_a6: all} ${_a7: all} ${_a8: all} ${_a9: all} ${_a10: all}
+	sign: _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10
+	take: 17000
+}

@@ -1,0 +1,156 @@
+vocab auslan_v1
+
+
+unit TextToSign {
+	english: > The ${_a1: nouns} is ${_a2: adjectives}
+	sign: _a1, _a2
+	take: 800
+}
+
+let same = sign[id 610]
+unit TextToSign {
+	english: > The ${_a1: nouns} is a ${_a2: nouns}
+	sign: _a1, same, _a2
+	take: 3200 // each word appears at least 4 times in each space
+}
+
+let nearly = sign[id 242]
+unit TextToSign {
+	english: > The ${_a1: nouns} is like a ${_a2: nouns}
+	sign: _a1, nearly, same, _a2
+	take: 3200 // each word appears at least 4 times in each space
+}
+
+unit TextToSign {
+	english: > The ${_a1: nouns} is ${_a2: adjectives} and ${_a3: adjectives}
+	sign: _a1, _a2, _a3
+	take: 3200
+}
+
+unit TextToSign {
+	english: > The ${_a1: nouns} is ${_a2: adjectives} ${_a3: adjectives} and ${_a4: adjectives}
+	sign: _a1, same, _a2, _a3, _a4
+	take: 3200
+}
+
+unit TextToSign {
+	english: > The ${_a2: adjectives} ${_a3: adjectives} and ${_a4: adjectives} ${_a1: nouns}
+	sign: _a1, same, _a2, _a3, _a4
+	take: 3000
+}
+
+unit TextToSign {
+	english: > The ${_a2: adjectives} and ${_a4: adjectives} ${_a1: nouns}
+	sign: _a1, same, _a2, _a4
+	take: 3000
+}
+
+unit TextToSign {
+	english: > The ${_a2: adjectives} ${_a1: nouns}
+	sign: _a1, same, _a2
+	take: 3000
+}
+
+unit TextToSign {
+	english: > The ${_a2: adjectives} ${_a3: adjectives} ${_a4: adjectives} ${_a1: nouns}
+	sign: _a1, same, _a2, _a3, _a4
+	take: 3000
+}
+
+unit TextToSign {
+	english: > The ${_a2: adjectives} ${_a4: adjectives} ${_a1: nouns}
+	sign: _a1, same, _a2, _a4
+	take: 3000
+}
+
+
+
+
+let these = sign[id 806]
+unit TextToSign {
+	english: > These ${_a1: nouns}s are ${_a2: nouns}
+	sign: these, _a1, same, _a2
+	take: 500
+}
+
+let these = sign[id 806]
+unit TextToSign {
+	english: > These ${_a1: nouns}s are ${_a2: adjectives}
+	sign: these, _a1, same, _a2
+	take: 500
+}
+
+unit TextToSign {
+	english: > These ${_a1: nouns}s are like ${_a2: nouns}
+	sign: these, _a1, nearly, same, _a2
+	take: 500
+}
+
+unit TextToSign {
+	english: > These ${_a1: nouns}s are ${_a2: adjectives} and ${_a3: adjectives}
+	sign: these, _a1, _a2, _a3
+	take: 500
+}
+
+unit TextToSign {
+	english: > These ${_a1: nouns}s are ${_a2: adjectives} ${_a3: adjectives} and ${_a4: adjectives}
+	sign: these, _a1, same, _a2, _a3, _a4
+	take: 500
+}
+
+unit TextToSign {
+	english: > These ${_a2: adjectives} ${_a3: adjectives} and ${_a4: adjectives} ${_a1: nouns}s
+	sign: these, _a1, same, _a2, _a3, _a4
+	take: 500
+}
+
+unit TextToSign {
+	english: > These ${_a2: adjectives} and ${_a4: adjectives} ${_a1: nouns}s
+	sign: these, _a1, same, _a2, _a4
+	take: 500
+}
+
+unit TextToSign {
+	english: > These ${_a2: adjectives} ${_a1: nouns}s
+	sign: these, _a1, _a2
+	take: 500
+}
+
+unit TextToSign {
+	english: > These ${_a2: adjectives} ${_a3: adjectives} ${_a4: adjectives} ${_a1: nouns}s
+	sign: these, _a1, same, _a2, _a3, _a4
+	take: 500
+}
+
+unit TextToSign {
+	english: > These ${_a2: adjectives} ${_a4: adjectives} ${_a1: nouns}s
+	sign: these, _a1, same, _a2, _a4
+	take: 500
+}
+
+
+
+
+bad unit TextToSign {
+	english: > ${_a1: verbs} to the ${_a2: noun}
+	sign: _a1, _a2
+	take: 500
+}
+
+bad unit TextToSign {
+	english: > ${_a1: verbs} with ${_a2: noun}
+	sign: _a1, _a2
+	take: 500
+}
+
+bad unit TextToSign {
+	english: > ${_a1: verbs} from ${_a2: noun}
+	sign: _a1, _a2
+	take: 500
+}
+
+bad unit TextToSign {
+	english: > ${_a1: verbs} with ${_a2: noun} to the ${_a3: noun}
+	sign: _a1, _a2, _a3
+	take: 500
+}
