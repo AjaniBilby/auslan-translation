@@ -1,4 +1,8 @@
+saved_models*/*
 node_modules/*
+
+# temp files
+~*
 
 .env
 *.json

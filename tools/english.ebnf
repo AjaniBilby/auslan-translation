@@ -1,0 +1,37 @@
+/* Main sentence structures */
+<SENTENCE>  ::= <STATEMENT> | <QUESTION> | <COMMAND>
+
+<STATEMENT> ::= <ADJ>+ <ADVERB>+ <SUBJECT>? <ADJECTIVE>+ <VERB>? " "
+
+<QUESTION>  ::= <ADJ>+ <ADVERB>+ "DO " <SUBJECT> <ADJECTIVE>+ <VERB>? " "
+
+<COMMAND>   ::= <ADJ>+ <ADVERB>+ <VERB> " "
+
+/* Definitions for various parts of speech */
+<ADVERB>    ::= <ADV> " " | <WHEN> <STATEMENT> " " | <IF> <STATEMENT> " " | <GERUND> " " | <PREP> " " <NP> " "
+
+<ADJECTIVE> ::= <GERUND> " " | <PREP> " " <NP> " " | <ADJ> " "
+
+<CLAUSE>    ::= <ADJECTIVE>+ <ADVERB>+ <SUBJECT> <VERB>
+
+<FOGHORN>   ::= (<PREP> "-")? (<NP> "-")? <OBJECT>
+<GERUND>    ::= <FOGHORN> | <GER>
+
+<WHEN>      ::= "when " | "whereby " | "until " | "unless "
+<IF>        ::= "not "? ("if " | "only if " | "because ")
+<AND>       ::= "and " | "but " | "or "
+<PREP>      ::= "not"? ("to " | "onto " | "into " | "of " | "out of " | "in " | "within " | "by " | "with " | "without ")
+
+<ADJ> ::= "purple " | "smelly " | "happy " | "windy " | "unbelievable "
+<NP>        ::= ("a " | "the ") <ADJ>+ <NOUN>
+<ADV>       ::= "quicky " | "slowly " | "happily "
+<SUBJECT> ::= <NP>
+<OBJECT> ::= <NP>
+<LOCATION> ::= <NP>
+<NOUN>      ::= "cat " | "dog " | "man "
+
+
+
+/* includes object for transient/intransitive use of verbs */
+<VERB>      ::= "berate " <OBJECT>? " " | "stop " <OBJECT>? " " | "flee " <OBJECT>? " " | "put " <OBJECT> <LOCATION>+
+<GER>       ::= "berating " | "stopping " | "fleeing " | "putting "
