@@ -25,9 +25,9 @@
 <ADJ> ::= "purple " | "smelly " | "happy " | "windy " | "unbelievable "
 <NP>        ::= ("a " | "the ") <ADJ>+ <NOUN>
 <ADV>       ::= "quicky " | "slowly " | "happily "
-<SUBJECT> ::= <NP>
-<OBJECT> ::= <NP>
-<LOCATION> ::= <NP>
+<SUBJECT>   ::= <NP>
+<OBJECT>    ::= <NP>
+<LOCATION>  ::= <NP>
 <NOUN>      ::= "cat " | "dog " | "man "
 
 

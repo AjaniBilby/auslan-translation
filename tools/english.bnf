@@ -4,17 +4,12 @@
 SENTENCE  ::= STATEMENT | QUESTION | COMMAND
 
 STATEMENT ::= ADJ+ ADVERB+ SUBJECT? ADJECTIVE+ VERB? " "
-
 QUESTION  ::= ADJ+ ADVERB+ "DO " SUBJECT ADJECTIVE+ VERB? " "
-
 COMMAND   ::= ADJ+ ADVERB+ VERB " "
 
 # Definitions for various parts of speech
 ADVERB    ::= ADV " " | WHEN STATEMENT " " | IF STATEMENT " " | GERUND " " | PREP " " NP " "
-
 ADJECTIVE ::= GERUND " " | PREP " " NP " " | ADJ " "
-
-
 
 CLAUSE    ::= ADJECTIVE+ ADVERB+ SUBJECT VERB
 
