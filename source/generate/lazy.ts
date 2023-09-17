@@ -1,4 +1,6 @@
-export class LazySamples<T> {
+import { LazySequence } from "../helper.ts";
+
+export class LazySamples<T> implements LazySequence<T> {
 	options: T[][];
 	order: number[];
 	_key: Uint32Array;
@@ -22,7 +24,11 @@ export class LazySamples<T> {
 		return domain;
 	}
 
-	getSampleLength() {
+	get length() {
+		return this.getLength();
+	}
+
+	lengthAt() {
 		return this.options.length;
 	}
 

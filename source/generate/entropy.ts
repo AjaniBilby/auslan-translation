@@ -1,14 +1,18 @@
+import { LazySequence, msToDuration } from "../helper.ts";
 import { Translation, SignRef } from "./generator.ts";
+import { AddHistogramEntry, CalculateEntropy, EstEntropy, FullyOverlapsHistogram, HasHistogramOverlap } from "./histogram.ts";
 import { LazySamples } from "./lazy.ts";
 
 
 class Option{
 	index: number;
 	entropy: number;
+	length: number;
 
-	constructor(index: number, entropy: number) {
+	constructor(index: number, entropy: number, length: number) {
 		this.index = index;
 		this.entropy = entropy;
+		this.length = length;
 	}
 }
 
@@ -48,12 +52,10 @@ const HIGH_WATER_MARK = 2**18;
 function* ShuffleSet(x: number): Generator<number, void, unknown> {
 	// Prevent memory overflow
 	if (x > HIGH_WATER_MARK) {
-		for (const val of RandomSet(x)) {
-			yield val;
-		}
-
+		console.warn(`WARN: Hit high water mark for possible LazySequences, using a random subset of ${HIGH_WATER_MARK} instead`)
+		yield* RandomSet(x);
 		return;
-	};
+	}
 
 	const indices = Array.from({ length: x + 1 }, (_, i) => i);
 	for (let i = indices.length - 1; i > 0; i--) {
@@ -72,14 +74,13 @@ function* RandomSet(x: number): Generator<number, void, unknown> {
 }
 
 
-export function Entropify(text: LazySamples<SignRef | string>, tokens: LazySamples<number>, take: number): Translation[] {
+export function Entropify(text: LazySequence<string | SignRef>, tokens: LazySequence<number>, take: number): Translation[] {
 	// Calculate the list of indices
-	const length = tokens.getLength();
+	const length = tokens.length;
 	const indices = new Set<number>();
 	const out: Translation[] = [];
 	take = Math.min(length, take);
 
-	const sampleLength = tokens.getSampleLength();
 	const histogram: { [key: string]: number } = {};
 	const start = Date.now();
 	let totalTokens = 0;
@@ -90,12 +91,12 @@ export function Entropify(text: LazySamples<SignRef | string>, tokens: LazySampl
 		if (!HasHistogramOverlap(histogram, tokens.get(idx))) {
 			// Add translation
 			const sampleTokens = [...tokens.get(idx)];
-			const sampleText = [...text.get(idx)].join("");
+			const sampleText = [...text.get(idx)].join(" ");
 			out.push(new Translation(sampleText, sampleTokens));
 
 			// Update state
 			AddHistogramEntry(histogram, sampleTokens);
-			totalTokens += sampleLength;
+			totalTokens += sampleTokens.length;
 		} else {
 			indices.add(idx);
 		}
@@ -111,14 +112,14 @@ export function Entropify(text: LazySamples<SignRef | string>, tokens: LazySampl
 	let entropy = CalculateEntropy(histogram, totalTokens);
 	function AddOption(opt: Option) {
 		const sampleTokens = [...tokens.get(opt.index)];
-		const sampleText = [...text.get(opt.index)].join("");
+		const sampleText = [...text.get(opt.index)].join(" ");
 		out.push(new Translation(sampleText, sampleTokens));
 		indices.delete(opt.index);
 
 		// Update state
 		entropy = CalculateEntropy(histogram, totalTokens);
 		AddHistogramEntry(histogram, sampleTokens);
-		totalTokens += sampleLength;
+		totalTokens += sampleTokens.length;
 	}
 
 
@@ -135,16 +136,17 @@ export function Entropify(text: LazySamples<SignRef | string>, tokens: LazySampl
 	WriteText("estimating duration...");
 	while (partialIndices.size > 0 && out.length < take) {
 		// Take best options
-		let options: Option[] = [];
+		const options: Option[] = [];
 		for (const idx of indices) {
 			if (FullyOverlapsHistogram(histogram, tokens.get(idx))) {
 				partialIndices.delete(idx);
 				continue;
-			};
+			}
 
-			const e = EstEntropy(histogram, totalTokens, entropy, sampleLength, tokens.get(idx));
+			const length = tokens.lengthAt(idx);
+			const e = EstEntropy(histogram, totalTokens, entropy, length, tokens.get(idx));
 			if (!IsEntropyWorthy(options, e)) continue;
-			InsertOption(options, new Option(idx, e));
+			InsertOption(options, new Option(idx, e, length));
 		}
 
 		// Add the best 10 of 100
@@ -157,17 +159,15 @@ export function Entropify(text: LazySamples<SignRef | string>, tokens: LazySampl
 
 			// Update option's entropies
 			for (const opt of options) {
-				opt.entropy = EstEntropy(histogram, totalTokens, entropy, sampleLength, tokens.get(opt.index));
+				opt.entropy = EstEntropy(histogram, totalTokens, entropy, opt.length, tokens.get(opt.index));
 			}
 			options.sort(OptionSorter);
 		}
 
-		if (out.length % 100 === 0) {
-			const duration = Date.now() - start;
-			const total = duration / ( out.length/take );
-			const remaining = total-duration;
-			WriteText(`\r  ${take-out.length} remaining ${msToDuration(remaining)} (${indices.size})    `);
-		}
+		const duration = Date.now() - start;
+		const total = duration / ( out.length/take );
+		const remaining = total-duration;
+		WriteText(`\r  ${take-out.length} remaining ${msToDuration(remaining)} (${indices.size})    `);
 	}
 	WriteText(`\r                                                           \r`);
 	console.timeEnd("  medium fill");
@@ -179,11 +179,12 @@ export function Entropify(text: LazySamples<SignRef | string>, tokens: LazySampl
 	console.time("  slow fill");
 	while (indices.size > 0 && out.length < take) {
 		// Take best options
-		let options: Option[] = [];
+		const options: Option[] = [];
 		for (const idx of indices) {
-			const e = EstEntropy(histogram, totalTokens, entropy, sampleLength, tokens.get(idx));
+			const length = tokens.lengthAt(idx);
+			const e = EstEntropy(histogram, totalTokens, entropy, length, tokens.get(idx));
 			if (!IsEntropyWorthy(options, e)) continue;
-			InsertOption(options, new Option(idx, e));
+			InsertOption(options, new Option(idx, e, length));
 		}
 
 		// Add the best 10 of 100
@@ -194,12 +195,12 @@ export function Entropify(text: LazySamples<SignRef | string>, tokens: LazySampl
 
 			// Update option's entropies
 			for (const opt of options) {
-				opt.entropy = EstEntropy(histogram, totalTokens, entropy, sampleLength, tokens.get(opt.index));
+				opt.entropy = EstEntropy(histogram, totalTokens, entropy, opt.length, tokens.get(opt.index));
 			}
 			options.sort(OptionSorter);
 		}
 
-		if (out.length % 100 === 0) {
+		if (out.length % 10 === 0) {
 			const duration = Date.now() - start;
 			const total = duration / ( out.length/take );
 			const remaining = total-duration;
@@ -211,71 +212,4 @@ export function Entropify(text: LazySamples<SignRef | string>, tokens: LazySampl
 	console.log(`  Entropy: ${entropy}`);
 
 	return out;
-}
-
-function msToDuration(ms: number) {
-	let total_seconds = Math.floor(ms / 1000);
-	let seconds = total_seconds % 60;
-	let minutes = Math.floor(total_seconds / 60);
-
-	return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-}
-
-function CalculateEntropy(histogram: { [key: string]: number }, total: number): number {
-	let tally = 0;
-	for (const key in histogram) {
-		if (histogram[key] === 0) continue;
-
-		const prob = histogram[key]/total;
-		tally += prob * Math.log2(prob);
-	}
-
-	return -tally;
-}
-
-function EstEntropy(
-	histogram: { [key: string]: number },
-	total: number, entropy: number, sampleLength: number,
-	sample: Generator<number> | number[]
-): number {
-	const newTotal = total + sampleLength;
-
-	for (const token of sample) {
-		if (histogram[token]) {
-			const p = histogram[token]/total;
-			entropy += p * Math.log2(p);
-			const pn = (histogram[token]+1)/newTotal;
-			entropy -= pn * Math.log2(p);
-		} else {
-			const pn = 1/newTotal;
-			entropy -= pn * Math.log2(pn);
-		}
-	}
-
-	return entropy;
-}
-
-function AddHistogramEntry(histogram: { [key: string]: number }, tokens: Generator<number> | number[]) {
-	for (const token of tokens) {
-		histogram[token] = (histogram[token] || 0) + 1;
-	}
-}
-function SubHistogramEntry(histogram: { [key: string]: number }, tokens: number[]) {
-	for (const token of tokens) {
-		histogram[token] -= 1;
-	}
-}
-
-function HasHistogramOverlap(histogram: { [key: string]: number }, tokens: Generator<number>) {
-	for (const token of tokens) {
-		if (histogram[token]) return true;
-	}
-	return false;
-}
-
-function FullyOverlapsHistogram(histogram: { [key: string]: number }, tokens: Generator<number>) {
-	for (const token of tokens) {
-		if (!histogram[token]) return false;
-	}
-	return true;
 }

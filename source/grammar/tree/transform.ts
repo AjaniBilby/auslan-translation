@@ -26,6 +26,18 @@ export class Transform implements LazyBranch {
 		this.order = order;
 	}
 
+	lengthAt(index: number): number {
+		let tally = 0;
+		for (const child of this.seq) {
+			const len = child.length;
+			tally += child.lengthAt(index % len);
+
+			if (index === 0) break;
+			index = Math.floor(index/len);
+		}
+
+		return tally;
+	}
 
 	*get(index: number, sign: boolean, tense: Tense) {
 		if (sign) {

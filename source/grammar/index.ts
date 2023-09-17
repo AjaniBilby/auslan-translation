@@ -10,6 +10,9 @@ import { Sequence } from "./tree/sequence.ts";
 import { dataset } from "../dataset.ts";
 import { Select } from "./tree/select.ts";
 import { Tenser } from "./tree/tenser.ts";
+import { TreeSeqWrapper } from "./tree/wrapper.ts";
+import { Entropify } from "../generate/entropy.ts";
+import { LazySequence } from "../helper.ts";
 await Parser.ready;
 
 const listID = {
@@ -113,16 +116,28 @@ const SENTENCE = new Select([STATEMENT, COMMAND, QUESTION, CLAUSE]);
 
 
 const target = SENTENCE;
-for (let i=0; i<10; i++) {
-	const i = Math.floor(Math.random()*target.length);
+// for (let i=0; i<10; i++) {
+// 	const i = Math.floor(Math.random()*target.length);
 
-	console.log(">", [...target.get(i, false, Tense.NONE)].join(" "))
-}
-
-
+// 	console.log(">", [...target.get(i, false, Tense.NONE)].join(" "))
+// }
 
 
-// const csv = questions
-// 	.map(x => `"${x.text}","${x.sequence.join(",")}"`)
-// 	.join("\n") || "";
-// Deno.writeTextFileSync(`./concept/grammar.csv`, csv);
+
+console.log(`Entropifying ${target.length}`);
+const title = `  Time`;
+console.time(title);
+const questions = Entropify(
+	new TreeSeqWrapper(SENTENCE, false, Tense.NONE) as LazySequence<string>,
+	new TreeSeqWrapper(SENTENCE, true, Tense.NONE) as LazySequence<number>,
+	100
+);
+console.timeEnd(title);
+
+
+
+
+const csv = questions
+	.map(x => `"${x.text}","${x.sequence.join(",")}"`)
+	.join("\n") || "";
+Deno.writeTextFileSync(`./concept/grammar.csv`, csv);

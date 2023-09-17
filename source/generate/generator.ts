@@ -23,10 +23,8 @@ export class Translation {
 	constructor(english: string, tokenSeq: number[]) {
 		this.text = english
 			.toLowerCase()
-			.replace(/-/g, " ")
-			.replace(/'/g, "")
+			.replace(/  |-/g, " ")
 			.replace(/[^a-z0-9 ]/g, "")
-			.replace(/  /g, " ")
 			.trim();
 		this.sequence = tokenSeq;
 	}
@@ -406,7 +404,7 @@ export class Scope {
 		});
 		const mapping = names.map(x => adjusted.indexOf(x));
 
-		return new LazySamples(list, mapping);
+		return new LazySamples<number>(list, mapping);
 	}
 
 

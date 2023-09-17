@@ -15,6 +15,18 @@ export class Select implements LazyBranch {
 		}
 	}
 
+	lengthAt(index: number): number {
+		for (const child of this.children) {
+			if (index > child.length) {
+				index -= child.length;
+				continue;
+			}
+
+			return child.lengthAt(index);
+		}
+
+		throw new Error(`Index oversized, unable to find child selection`);
+	}
 
 	*get(index: number, sign: boolean, tense: Tense) {
 		for (const child of this.children) {

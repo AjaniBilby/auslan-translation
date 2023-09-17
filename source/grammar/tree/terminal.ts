@@ -18,6 +18,9 @@ export class Terminal implements LazyBranch {
 		this.length = this.opts.length;
 	}
 
+	lengthAt(index: number): number {
+		return 1;
+	}
 
 	*get(index: number, sign: boolean = false, tense: Tense) {
 		const target = this.opts[index];

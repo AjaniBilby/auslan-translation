@@ -19,6 +19,22 @@ export class Repetition implements LazyBranch {
 		}
 	}
 
+	lengthAt(index: number): number {
+		if (this.min === 0) {
+			if (index === 0) return 0;
+			index -= 1;
+		}
+
+		let tally = 0;
+		for (let i=0; i<this.range; i++) {
+			tally += this.child.lengthAt(index % this.child.length);
+
+			if (index === 0) break;
+			index = Math.floor(index/this.child.length);
+		}
+
+		return tally;
+	}
 
 	*get(index: number, sign: boolean, tense: Tense) {
 		if (this.min === 0) {
