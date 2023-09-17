@@ -3,13 +3,13 @@
 import * as colors from "https://deno.land/std@0.201.0/fmt/colors.ts";
 
 import * as Parser from "../bnf/syntax.js";
-import { Tense, Terminal } from "./terminal.ts";
-import { Sequence } from "./sequence.ts";
-import { Select } from "./select.ts";
-import { Repetition } from "./repetition.ts";
+import { Tense, Terminal } from "./tree/terminal.ts";
+import { Repetition } from "./tree/repetition.ts";
+import { Transform } from "./tree/transform.ts";
+import { Sequence } from "./tree/sequence.ts";
 import { dataset } from "../dataset.ts";
-import { Tenser } from "./tenser.ts";
-import { Transform } from "./transform.ts";
+import { Select } from "./tree/select.ts";
+import { Tenser } from "./tree/tenser.ts";
 await Parser.ready;
 
 const listID = {
