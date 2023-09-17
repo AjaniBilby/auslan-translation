@@ -130,7 +130,7 @@ console.time(title);
 const questions = Entropify(
 	new TreeSeqWrapper(SENTENCE, false, Tense.NONE) as LazySequence<string>,
 	new TreeSeqWrapper(SENTENCE, true, Tense.NONE) as LazySequence<number>,
-	100
+	7_000
 );
 console.timeEnd(title);
 
