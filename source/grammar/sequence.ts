@@ -1,10 +1,11 @@
-import { Terminal } from "./terminal.ts";
+import { LazyBranch } from "./shared.ts";
+import { Tense } from "./terminal.ts";
 
-export class Sequence {
-	seq: Terminal[];
+export class Sequence implements LazyBranch {
+	seq: LazyBranch[];
 	length: number;
 
-	constructor(seq: Terminal[]) {
+	constructor(seq: LazyBranch[]) {
 		this.seq = seq;
 
 		this.length = 1;
@@ -14,10 +15,10 @@ export class Sequence {
 	}
 
 
-	*get(index: number, sign: boolean = false) {
+	*get(index: number, sign: boolean, tense: Tense) {
 		for (const child of this.seq) {
 			const len = child.length;
-			yield* child.get(index % len, sign);
+			yield* child.get(index % len, sign, tense);
 			index = Math.floor(index/len);
 		}
 	}
