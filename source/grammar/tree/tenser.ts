@@ -18,6 +18,11 @@ export class Tenser implements LazyBranch {
 		return this.child.lengthAt(index);
 	}
 
+	*rand(_tense: Tense) {
+		const choice = Math.floor(Math.random()*this.opts.length);
+		yield* this.child.rand(this.opts[choice]);
+	}
+
 	*get(index: number, sign: boolean, _tense: Tense) {
 		const choice = index % this.opts.length;
 		index = Math.floor(index/this.opts.length);

@@ -28,6 +28,13 @@ export class Select implements LazyBranch {
 		throw new Error(`Index oversized, unable to find child selection`);
 	}
 
+	*rand(tense: Tense) {
+		const choice = Math.floor(Math.random()*this.children.length);
+		const child = this.children[choice];
+
+		yield* child.rand(tense);
+	}
+
 	*get(index: number, sign: boolean, tense: Tense) {
 		for (const child of this.children) {
 			if (index > child.length) {

@@ -39,6 +39,34 @@ export class Transform implements LazyBranch {
 		return tally;
 	}
 
+	*rand(tense: Tense): Generator<[number, string], void, unknown> {
+		const cache: Array<[number, string][]> = [];
+		for (const child of this.seq) {
+			cache.push([...child.rand(tense)]);
+		}
+
+
+		const signs: Array<number> = [];
+		const words: Array<string> = [];
+
+		for (let i=0; i<cache.length; i++) {
+			signs.push(...cache[i].map(x => x[0]));
+		}
+
+		for (let i=0; i<cache.length; i++) {
+			const idx = this.order[i];
+			words.push(...cache[idx].map(x => x[1]));
+		}
+
+		const len = Math.max(signs.length, words.length);
+		for (let i=0; i<len; i++) {
+			yield [
+				signs[i],
+				words[i]
+			];
+		}
+	}
+
 	*get(index: number, sign: boolean, tense: Tense) {
 		if (sign) {
 			for (const child of this.seq) {

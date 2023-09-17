@@ -22,7 +22,15 @@ export class Terminal implements LazyBranch {
 		return 1;
 	}
 
-	*get(index: number, sign: boolean = false, tense: Tense) {
+	*rand(tense: Tense) {
+		const index = Math.floor(Math.random()*this.length);
+		const sign = this.get(index, true, tense).next().value;
+		const word = this.get(index, false, tense).next().value;
+
+		yield [ sign, word ] as [number, string];
+	}
+
+	*get(index: number, sign: boolean, tense: Tense) {
 		const target = this.opts[index];
 		if (typeof target === "string") {
 			if (!sign) yield target;

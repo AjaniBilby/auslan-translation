@@ -27,6 +27,12 @@ export class Sequence implements LazyBranch {
 		return tally;
 	}
 
+	*rand(tense: Tense) {
+		for (const child of this.seq) {
+			yield* child.rand(tense);
+		}
+	}
+
 	*get(index: number, sign: boolean, tense: Tense) {
 		for (const child of this.seq) {
 			const len = child.length;

@@ -36,6 +36,14 @@ export class Repetition implements LazyBranch {
 		return tally;
 	}
 
+	*rand(tense: Tense) {
+		const count = Math.random()*this.range + this.min;
+
+		for (let i=0; i<count; i++) {
+			yield* this.child.rand(tense);
+		}
+	}
+
 	*get(index: number, sign: boolean, tense: Tense) {
 		if (this.min === 0) {
 			if (index === 0) return;
