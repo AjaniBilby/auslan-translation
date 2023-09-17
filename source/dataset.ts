@@ -29,3 +29,9 @@ export const dataset: {
 		[key: string]: SignID[]
 	},
 } = JSON.parse(Deno.readTextFileSync("./data/signs.json"));
+
+
+export const signMap = new Map<SignID, Sign>();
+for (const sign of dataset.sign) {
+	signMap.set(sign.id, sign);
+}
