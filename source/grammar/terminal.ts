@@ -33,7 +33,6 @@ export class Terminal implements LazyBranch {
 			if (!sign) throw new Error(`Unknown sign id ${target}`);
 
 			let text: undefined | string;
-			console.log(36, tense);
 			switch (tense) {
 				case Tense.PAST:    text = sign.tensePast; break;
 				case Tense.PRESENT: text = sign.tenseCurrent; break;

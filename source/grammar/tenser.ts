@@ -18,7 +18,6 @@ export class Tenser implements LazyBranch {
 	*get(index: number, sign: boolean, _tense: Tense) {
 		const choice = index % this.opts.length;
 		index = Math.floor(index/this.opts.length);
-		console.log(" ", this.opts[choice])
 		yield* this.child.get(index, sign, this.opts[choice]);
 	}
 }

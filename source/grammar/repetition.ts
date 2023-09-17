@@ -27,7 +27,6 @@ export class Repetition implements LazyBranch {
 		}
 
 		for (let i=0; i<this.range; i++) {
-			console.log(30, tense);
 			yield* this.child.get(index % this.child.length, sign, tense);
 
 			if (index === 0) break;
