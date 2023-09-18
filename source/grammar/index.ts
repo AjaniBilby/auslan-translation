@@ -8,14 +8,14 @@ import { TreeSeqWrapper } from "./tree/wrapper.ts";
 import { Entropify } from "../generate/entropy.ts";
 import { LazySequence } from "../helper.ts";
 import { NOUN, SENTENCE } from "./tree/index.ts";
-import { Transform } from "./tree/transform.ts";
+import { TransformMode } from "./tree/transform.ts";
 import { Translation } from "../generate/generator.ts";
 await Parser.ready;
 
 
 
 
-
+TransformMode(true); // apply order transformations
 const target = SENTENCE;
 function RandomSamples() {
 	const questions = [] as Translation[];

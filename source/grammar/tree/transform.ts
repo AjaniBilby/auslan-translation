@@ -1,6 +1,12 @@
 import { LazyBranch } from "./shared.ts";
 import { Tense } from "./terminal.ts";
 
+let APPLY_TRANSFORMATION = true;
+
+export function TransformMode(applied: boolean) {
+	APPLY_TRANSFORMATION = applied;
+}
+
 export class Transform implements LazyBranch {
 	seq: LazyBranch[];
 	order: number[];
@@ -54,7 +60,7 @@ export class Transform implements LazyBranch {
 		}
 
 		for (let i=0; i<cache.length; i++) {
-			const idx = this.order[i];
+			const idx = APPLY_TRANSFORMATION ? this.order[i] : i;
 			words.push(...cache[idx].map(x => x[1]));
 		}
 
@@ -68,7 +74,7 @@ export class Transform implements LazyBranch {
 	}
 
 	*get(index: number, sign: boolean, tense: Tense) {
-		if (sign) {
+		if (sign || !APPLY_TRANSFORMATION) {
 			for (const child of this.seq) {
 				const len = child.length;
 				yield* child.get(index % len, sign, tense);
