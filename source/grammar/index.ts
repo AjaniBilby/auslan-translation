@@ -20,7 +20,7 @@ const target = SENTENCE;
 function RandomSamples() {
 	const questions = [] as Translation[];
 
-	for (let i=0; i<100_000; i++) {
+	for (let i=0; i<500_000; i++) {
 		const sample = [...target.rand(Tense.NONE)];
 
 		questions.push(
