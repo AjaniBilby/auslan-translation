@@ -5,7 +5,7 @@ import torch
 from transformers import BartForConditionalGeneration, BartTokenizer
 from flask import Flask, request, jsonify
 
-model_path = './saved_models/epoch_52'
+model_path = './saved_models/epoch_130'
 
 
 class SimpleBART(torch.nn.Module):
