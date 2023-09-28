@@ -62,14 +62,14 @@ export const ADJECTIVE = new Select([
 export const STATEMENT = new Transform([
 	SUBJECT,
 	new Repetition(ADJ, 0, 2),    // ADJ+
-	new Repetition( new Select([  // STATEMENT-LESS ADVERB+
+	new Repetition(new Select([  // STATEMENT-LESS ADVERB+
 		ADV,
 		GERUND,
 		new Sequence([PREP, NP]),
 	]), 0, 2),
-	new Repetition(VERB, 0, 2),
 	new Repetition(ADJECTIVE, 1, 3),
-], [1, 2, 0, 4, 3]);
+	new Repetition(VERB, 0, 2),
+], [1, 2, 0, 3, 4]);
 
 export const ADVERB = new Select([
 	ADV,
@@ -93,13 +93,13 @@ export const COMMAND = new Transform([
 	new Repetition(ADVERB, 1, 1),
 ], [1, 2, 0]);
 export const QUESTION = new Transform([
-	new Repetition(new Terminal(dataset.list[listID.questionSigns]), 0, 1),
+	SUBJECT,
 	new Repetition(ADJ, 0, 1),
 	new Repetition(ADVERB, 1, 1),
 	new Terminal(["DO"]),
-	SUBJECT,
 	new Repetition(ADJECTIVE, 1, 1),
 	new Repetition(VERB, 0, 2),
-], [0, 1, 2, 3, 4, 5, 6]);
+	new Repetition(new Terminal(dataset.list[listID.questionSigns]), 0, 1),
+], [6, 1, 2, 3, 0, 4, 5]);
 
 export const SENTENCE = new Select([STATEMENT, COMMAND, QUESTION, CLAUSE]);

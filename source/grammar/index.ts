@@ -1,13 +1,11 @@
 /// <reference lib="deno.ns" />
 
-import * as colors from "https://deno.land/std@0.201.0/fmt/colors.ts";
-
 import * as Parser from "../bnf/syntax.js";
-import { Tense, Terminal } from "./tree/terminal.ts";
+import { Tense } from "./tree/terminal.ts";
 import { TreeSeqWrapper } from "./tree/wrapper.ts";
 import { Entropify } from "../generate/entropy.ts";
 import { LazySequence } from "../helper.ts";
-import { NOUN, SENTENCE } from "./tree/index.ts";
+import { SENTENCE } from "./tree/index.ts";
 import { TransformMode } from "./tree/transform.ts";
 import { Translation } from "../generate/generator.ts";
 await Parser.ready;
