@@ -91,13 +91,6 @@ function Transparent(out: number) {
 	buffer.data[out+2] = 0;
 	buffer.data[out+3] = 0;
 }
-function Darken(amount: number, out: number) {
-	amount = 1-amount*0.7;
-	buffer.data[out+0] *= amount;
-	buffer.data[out+1] *= amount;
-	buffer.data[out+2] *= amount;
-	buffer.data[out+3] = 255;
-}
 
 function Kernel(x: number, y: number, out: number) {
 	let p_x = x / colWidth;
