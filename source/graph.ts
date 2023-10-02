@@ -74,8 +74,6 @@ const ctx = canvas.getContext("2d");
 
 const buffer    = ctx.getImageData(0, 0, 3000, 1000);
 const colWidth  = buffer.width / (data.length-1);
-const pixelSize = 4;
-const lineThreshold = 1.5/buffer.height*max;
 
 function Colorize(colA: number, colB: number, p: number, out: number) {
 	const a = colKey[colA];
@@ -119,13 +117,7 @@ function Kernel(x: number, y: number, out: number) {
 
 
 		const p = (local_y - next) / (past - next);
-		if (next > local_y) {
-			Colorize( past_index-1, i-1, p, out )
-			const lineDelta = Math.abs(next-local_y);
-			if (lineDelta <= lineThreshold) Darken(lineDelta/lineThreshold, out);
-
-			return;
-		};
+		if (next > local_y) return Colorize( past_index-1, i-1, p, out );
 
 		past_index = i;
 		past = next;
@@ -137,13 +129,36 @@ function Kernel(x: number, y: number, out: number) {
 for (let y=0; y<buffer.height; y++) {
 	for (let x=0; x<buffer.width; x++) {
 		Kernel(
-			x,                               // x-coordinate
-			buffer.height-y,                 // y-coordinate invert
-			(x + y*buffer.width) * pixelSize // output ptr
+			x,                       // x-coordinate
+			buffer.height-y,         // y-coordinate invert
+			(x + y*buffer.width) * 4 // output ptr
 		);
 	}
 }
 
 ctx.putImageData(buffer, 0,0);
+
+
+
+
+ctx.globalAlpha = 0.2;
+ctx.lineWidth = 1;
+ctx.strokeStyle = "black";
+ctx.lineCap = "round";
+for (let col=1; col<data[0].length; col++) {
+	ctx.beginPath();
+	ctx.moveTo(
+		0,
+		buffer.height - data[0][col]/max*buffer.height,
+	);
+	for (let i=1; i<data.length; i++) {
+		ctx.lineTo(
+			i*colWidth,
+			buffer.height - data[i][col]/max*buffer.height,
+		);
+	}
+	ctx.stroke();
+}
+ctx.globalAlpha = 1.0;
 
 await Deno.writeFile(args.output, canvas.toBuffer());
