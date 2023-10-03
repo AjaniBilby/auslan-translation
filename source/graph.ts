@@ -62,7 +62,16 @@ function Hsl2Rgb(h: number) {
 		return new Uint8Array([c, 0, x, 255]);
 	}
 }
+function GreyScale(p: number) {
+	const b = p*255;
+	return new Uint8Array([b, b, b, 255]);
+}
+
 for (let i=0; i<regions; i++) {
+	// Grey scale
+	// colKey.push(GreyScale(1.0 - Math.abs(i/regions - 0.5) * 2.0));
+
+	// Hue based
 	colKey.push(Hsl2Rgb(i/regions * 360 + 180));
 }
 
