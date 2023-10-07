@@ -5,19 +5,14 @@ import torch
 from transformers import BartForConditionalGeneration, BartTokenizer
 from flask import Flask, request, jsonify
 
-model_path = './saved_models/epoch_80'
-
 
 class SimpleBART(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, model_path):
         super(SimpleBART, self).__init__()
 
         if os.path.exists(model_path):
-            self.bart = BartForConditionalGeneration.from_pretrained(
-                model_path)
-            # self.bart = BartForConditionalGeneration.from_pretrained('facebook/bart-base')
-            self.tokenizer = BartTokenizer.from_pretrained(
-                'facebook/bart-base')
+            self.bart = BartForConditionalGeneration.from_pretrained(model_path)
+            self.tokenizer = BartTokenizer.from_pretrained('facebook/bart-base')
         else:
             raise ValueError(
                 f"Model not found at {model_path}. Please make sure the path is correct or set load_from_saved to False.")
@@ -30,22 +25,17 @@ class SimpleBART(torch.nn.Module):
             if token_id == self.tokenizer.eos_token_id:
                 break
 
-model = SimpleBART()
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
-criterion = torch.nn.CrossEntropyLoss()
-eos_token_id = model.tokenizer.eos_token_id
+signedEnglish = SimpleBART('./saved_models/epoch_44')
+auslan        = SimpleBART('./saved_models/epoch_80')
 
 app = Flask(__name__)
 
 
-@app.route("/translate", methods=["POST"])
-def translate():
-    # Extract source text from JSON request
-    data = request.get_json(force=True)
-    source_text = data.get("source_text", "")
+def process(model, text):
+    eos_token_id = model.tokenizer.eos_token_id
 
     # Tokenize the input text
-    input_ids = model.tokenizer.encode(source_text, return_tensors="pt")
+    input_ids = model.tokenizer.encode(text, return_tensors="pt")
 
     # Beam search for top translations based on the input text
     translations = model.bart.generate(
@@ -68,11 +58,29 @@ def translate():
 
         options.append(token_list[2:eos_index])
 
+    return options
+
+@app.route("/translate/signed-english", methods=["POST"])
+def translateSignedEnglish():
+    # Extract source text from JSON request
+    data = request.get_json(force=True)
+    source_text = data.get("source_text", "")
+
     return jsonify({
         'vocab': "auslan_v1",
-        'translations': options
+        'translations': process(signedEnglish, source_text)
     })
 
+@app.route("/translate/auslan", methods=["POST"])
+def translateAuslan():
+    # Extract source text from JSON request
+    data = request.get_json(force=True)
+    source_text = data.get("source_text", "")
+
+    return jsonify({
+        'vocab': "auslan_v1",
+        'translations': process(auslan, source_text)
+    })
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
