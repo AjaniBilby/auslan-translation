@@ -26,7 +26,7 @@ class SimpleBART(torch.nn.Module):
                 break
 
 signedEnglish = SimpleBART('./saved_models/epoch_44')
-auslan        = SimpleBART('./saved_models/epoch_80')
+auslan        = SimpleBART('./saved_models/epoch_110')
 
 app = Flask(__name__)
 

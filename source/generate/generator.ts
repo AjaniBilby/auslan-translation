@@ -23,8 +23,11 @@ export class Translation {
 	constructor(english: string, tokenSeq: number[]) {
 		this.text = english
 			.toLowerCase()
-			.replace(/  |-/g, " ")
-			.replace(/[^a-z0-9 ]/g, "")
+			.replaceAll("\n", " ")
+			.replaceAll("-", " ")
+			.replaceAll("'", "")
+			.replaceAll(/[^a-z0-9 ]/g, "")
+			.replaceAll(/\s+/g, " ")
 			.trim();
 		this.sequence = tokenSeq;
 	}

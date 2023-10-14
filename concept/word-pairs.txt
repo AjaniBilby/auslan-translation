@@ -2,51 +2,51 @@ vocab auslan_v1
 
 
 unit TextToSign {
-	english: > ${_a1: verbs} ${_a2: prepositions}
-	sign: _a1, _a2
-	take: 2000
+	english: > ${_verb: verbs} ${_prep: prepositions}
+	sign: _prep, _verb
+	take: 1778
 }
 
 unit TextToSign {
-	english: > ${_a1: adVerbs} ${_a2: verbs}
-	sign: _a2, _a1
-	take: 2000
+	english: > ${_adv: adVerbs} ${_verb: verbs}
+	sign: _verb, _adv
+	take: 1778
 }
 
 unit TextToSign {
-	english: > ${_a1: adVerbs} ${_a2: verbs past}
-	sign: _a2, _a1
-	take: 2000
+	english: > ${_adv: adVerbs} ${_verb: verbs past}
+	sign: _verb, _adv
+	take: 1778
 }
 
 unit TextToSign {
-	english: > ${_a1: adVerbs} ${_a2: verbs present}
-	sign: _a2, _a1
-	take: 2000
+	english: > ${_adv: adVerbs} ${_verb: verbs present}
+	sign: _verb, _adv
+	take: 1778
 }
 
 unit TextToSign {
-	english: > ${_a1: adVerbs} ${_a2: verbs future}
-	sign: _a2, _a1
-	take: 2000
+	english: > ${_adv: adVerbs} ${_verb: verbs future}
+	sign: _verb, _adv
+	take: 1778
 }
 
 
 
 unit TextToSign {
-	english: > ${_a1: prepositions} ${_a2: nouns}
-	sign: _a1, _a2
-	take: 3200
+	english: > ${_prep: prepositions} ${_noun: nouns}
+	sign: _prep, _noun
+	take: 5276
 }
 
 unit TextToSign {
 	english: > ${_a1: nouns} ${_a2: nouns}
-	sign: _a2, _a1
-	take: 3200
+	sign: _a1, _a2
+	take: 71609
 }
 
 unit TextToSign {
-	english: > ${_a1: adjectives} ${_a2: nouns}
-	sign: _a2, _a1
-	take: 3200
+	english: > ${_adj: adjectives} ${_noun: nouns}
+	sign: _noun, _adj
+	take: 18196
 }

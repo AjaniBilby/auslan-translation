@@ -23,7 +23,14 @@ function RandomSamples() {
 
 		questions.push(
 			new Translation(
-				sample.map(x => x[1]).join(" "),
+				sample.map(x => x[1]).join(" ")
+					.toLowerCase()
+					.replace(/\n/g, " ")
+					.replace(/-/g, " ")
+					.replace(/'/g, "")
+					.replace(/[^a-z0-9 ]/g, "")
+					.replace(/  /g, " ")
+					.trim(),
 				sample.map(x => x[0]).filter(x => !isNaN(x))
 			)
 		)
