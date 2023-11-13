@@ -1,4 +1,7 @@
-export function CalculateEntropy(histogram: { [key: string]: number }, total: number): number {
+export function CalculateEntropy(
+	histogram: { [key: string]: number },
+	total: number
+): number {
 	let tally = 0;
 	for (const key in histogram) {
 		if (histogram[key] === 0) continue;
@@ -19,13 +22,12 @@ export function EstEntropy(
 
 	for (const token of sample) {
 		if (histogram[token]) {
+			// remove old influence
 			const p = histogram[token]/total;
 			entropy += p * Math.log2(p);
+			// add new influence
 			const pn = (histogram[token]+1)/newTotal;
 			entropy -= pn * Math.log2(p);
-		} else {
-			const pn = 1/newTotal;
-			entropy -= pn * Math.log2(pn);
 		}
 	}
 
