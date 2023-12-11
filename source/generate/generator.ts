@@ -1,16 +1,16 @@
 // @deno-types="../bnf/shared.d.ts"
-import { SyntaxNode, Reference, ReferenceRange, AssertUnreachable } from "../bnf/shared.js";
+import { SyntaxNode, Reference, ReferenceRange, AssertUnreachable } from "~/bnf/shared.js";
 // @deno-types="../bnf/syntax.d.ts"
-import { Term_Assign, Term_Block, Term_Expr, Term_Operand, Term_Program, Term_Statement, Term_Stmt_value, Term_String, Term_Vocab } from "../bnf/syntax.js";
+import { Term_Assign, Term_Block, Term_Expr, Term_Operand, Term_Program, Term_Statement, Term_Stmt_value, Term_String } from "~/bnf/syntax.js";
 
-import { ParseError } from "../bnf/shared.js";
-import { Parse_Program } from "../bnf/syntax.js";
+import { ParseError } from "~/bnf/shared.js";
+import { Parse_Program } from "~/bnf/syntax.js";
 
-import { Entropify } from "./entropy.ts";
-import { LazySamples } from './lazy.ts';
+import { Entropify } from "~/generate/entropy.ts";
+import { LazySamples } from "~/generate/lazy.ts";
 
-import { Sign, dataset } from "../dataset.ts";
-import { Panic } from "../helper.ts";
+import { Sign, dataset } from "~/dataset.ts";
+import { Panic } from "~/helper.ts";
 
 export {
 	ParseError, Reference, ReferenceRange

@@ -3,10 +3,10 @@
 import { existsSync } from "https://deno.land/std@0.201.0/fs/mod.ts";
 import * as colors from "https://deno.land/std@0.201.0/fmt/colors.ts";
 
-import { Panic } from "../helper.ts";
-import { Scope } from "./generator.ts";
+import { Panic } from "~/helper.ts";
+import { Scope } from "~/generate/generator.ts";
 
-import * as Parser from "../bnf/syntax.js";
+import * as Parser from "~/bnf/syntax.js";
 await Parser.ready;
 
 const target = Deno.args[0];

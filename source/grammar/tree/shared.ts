@@ -1,4 +1,4 @@
-import type { Tense } from "./terminal.ts";
+import type { Tense } from "~/grammar/tree/terminal.ts";
 
 export interface LazyBranch {
 	length: number;

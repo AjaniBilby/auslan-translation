@@ -1,6 +1,6 @@
-import { LazySequence } from "../../helper.ts";
-import { LazyBranch } from "./shared.ts";
-import { Tense } from "./terminal.ts";
+import { LazySequence } from "~/helper.ts";
+import { LazyBranch } from "~/grammar/tree/shared.ts";
+import { Tense } from "~/grammar/tree/terminal.ts";
 
 export class TreeSeqWrapper implements LazySequence<string | number> {
 	entry: LazyBranch;

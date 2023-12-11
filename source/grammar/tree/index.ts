@@ -1,10 +1,10 @@
-import { Tense, Terminal } from "./terminal.ts";
-import { Repetition } from "./repetition.ts";
-import { Transform } from "./transform.ts";
-import { Sequence } from "./sequence.ts";
-import { dataset } from "../../dataset.ts";
-import { Select } from "./select.ts";
-import { Tenser } from "./tenser.ts";
+import { Tense, Terminal } from "~/grammar/tree/terminal.ts";
+import { Repetition } from "~/grammar/tree/repetition.ts";
+import { Transform } from "~/grammar/tree/transform.ts";
+import { Sequence } from "~/grammar/tree/sequence.ts";
+import { dataset } from "~/dataset.ts";
+import { Select } from "~/grammar/tree/select.ts";
+import { Tenser } from "~/grammar/tree/tenser.ts";
 
 const listID = {
 	adjective: 177,

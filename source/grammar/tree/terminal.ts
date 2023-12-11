@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-inferrable-types
-import { SignID, dataset, signMap } from "../../dataset.ts";
-import { LazyBranch } from "./shared.ts";
+import { SignID, signMap } from "~/dataset.ts";
+import { LazyBranch } from "~/grammar/tree/shared.ts";
 
 export enum Tense {
 	PAST,

@@ -1,6 +1,5 @@
-
-import { LazyBranch } from "./shared.ts";
-import { Tense } from "./terminal.ts";
+import { LazyBranch } from "~/grammar/tree/shared.ts";
+import { Tense } from "~/grammar/tree/terminal.ts";
 
 export class Tenser implements LazyBranch {
 	child: LazyBranch;

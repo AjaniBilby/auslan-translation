@@ -1,13 +1,13 @@
 /// <reference lib="deno.ns" />
 
-import * as Parser from "../bnf/syntax.js";
-import { Tense } from "./tree/terminal.ts";
-import { TreeSeqWrapper } from "./tree/wrapper.ts";
-import { Entropify } from "../generate/entropy.ts";
-import { LazySequence } from "../helper.ts";
-import { SENTENCE } from "./tree/index.ts";
-import { TransformMode } from "./tree/transform.ts";
-import { Translation } from "../generate/generator.ts";
+import * as Parser from "~/bnf/syntax.js";
+import { TreeSeqWrapper } from "~/grammar/tree/wrapper.ts";
+import { TransformMode } from "~/grammar/tree/transform.ts";
+import { LazySequence } from "~/helper.ts";
+import { Translation } from "~/generate/generator.ts";
+import { Entropify } from "~/generate/entropy.ts";
+import { SENTENCE } from "~/grammar/tree/index.ts";
+import { Tense } from "~/grammar/tree/terminal.ts";
 await Parser.ready;
 
 

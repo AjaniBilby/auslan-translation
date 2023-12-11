@@ -1,7 +1,6 @@
-import { LazySequence, msToDuration } from "../helper.ts";
-import { Translation, SignRef } from "./generator.ts";
-import { AddHistogramEntry, CalculateEntropy, EstEntropy, FullyOverlapsHistogram, HasHistogramOverlap } from "./histogram.ts";
-import { LazySamples } from "./lazy.ts";
+import { AddHistogramEntry, CalculateEntropy, EstEntropy, FullyOverlapsHistogram, HasHistogramOverlap } from "~/generate/histogram.ts";
+import { LazySequence, msToDuration } from "~/helper.ts";
+import { Translation, SignRef } from "~/generate/generator.ts";
 
 
 class Option{

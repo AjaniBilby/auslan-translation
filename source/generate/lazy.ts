@@ -1,4 +1,4 @@
-import { LazySequence } from "../helper.ts";
+import { LazySequence } from "~/helper.ts";
 
 export class LazySamples<T> implements LazySequence<T> {
 	options: T[][];
